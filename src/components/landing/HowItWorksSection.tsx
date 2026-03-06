@@ -30,7 +30,7 @@ const steps = [
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="py-24">
+    <section id="how-it-works" className="py-24 scroll-mt-16">
       <div className="container mx-auto px-4">
         <div className="text-center">
           <h2 className="font-display text-3xl font-bold md:text-4xl">

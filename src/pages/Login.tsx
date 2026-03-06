@@ -3,17 +3,49 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { ensureSupabase } from "@/lib/supabase";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: integrate with Supabase auth
+    try {
+      setLoading(true);
+      const supabase = ensureSupabase();
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      toast.success("Signed in");
+      navigate("/dashboard");
+    } catch (err: any) {
+      toast.error(err?.message ?? "Sign in failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogle = async () => {
+    try {
+      const supabase = ensureSupabase();
+      const redirectTo = `${window.location.origin}/dashboard`;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo },
+      });
+      if (error) toast.error(error.message);
+    } catch (err: any) {
+      toast.error(err?.message ?? "Google sign-in failed");
+    }
   };
 
   return (
@@ -30,7 +62,7 @@ const Login = () => {
               <p className="mt-1 text-sm text-muted-foreground">Sign in to your account</p>
             </div>
 
-            <Button variant="outline" className="mb-4 w-full gap-2">
+            <Button variant="outline" className="mb-4 w-full gap-2" onClick={handleGoogle}>
               <svg className="h-4 w-4" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
                 <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -77,7 +109,7 @@ const Login = () => {
                   className="mt-1"
                 />
               </div>
-              <Button variant="gradient" className="w-full" type="submit">
+              <Button variant="gradient" className="w-full" type="submit" disabled={loading}>
                 Sign In
               </Button>
             </form>

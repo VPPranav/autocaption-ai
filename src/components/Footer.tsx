@@ -55,7 +55,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 border-t border-border/50 pt-6 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} AutoCaption AI. All rights reserved.
+          © {new Date().getFullYear()} AutoCaption AI. Developed By Pranav V P - All rights reserved.
         </div>
       </div>
     </footer>

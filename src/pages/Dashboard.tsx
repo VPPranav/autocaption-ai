@@ -6,6 +6,8 @@ import { ToneSelector } from "@/components/dashboard/ToneSelector";
 import { CaptionResults } from "@/components/dashboard/CaptionResults";
 import { Sparkles, History, CreditCard, Settings, Zap, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { hasUsedFree, isLoggedIn, markFreeUsed } from "@/lib/usageGate";
+import { toast } from "sonner";
 
 const sidebarItems = [
   { icon: Sparkles, label: "Generate", href: "/dashboard", active: true },
@@ -24,6 +26,11 @@ const Dashboard = () => {
 
   const handleGenerate = async () => {
     if (!imageFile) return;
+    const loggedIn = await isLoggedIn();
+    if (!loggedIn && hasUsedFree()) {
+      toast.error("Please Sign in for further use");
+      return;
+    }
     setLoading(true);
     // Simulate AI processing
     setTimeout(() => {
@@ -39,6 +46,7 @@ const Dashboard = () => {
         "#instagram", "#creative", "#marketing", "#growthhacking",
         "#engagement", "#contentisking",
       ]);
+      if (!loggedIn) markFreeUsed();
       setLoading(false);
     }, 2500);
   };
