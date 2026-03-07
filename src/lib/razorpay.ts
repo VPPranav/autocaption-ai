@@ -72,34 +72,6 @@ export async function openProCheckout(params: OpenProCheckoutParams = {}) {
   }
 
   let orderId: string | undefined = undefined;
-  let useDirect = false;
-  try {
-    const res = await fetch("/api/create-order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: amountInPaise,
-        currency: "INR",
-        notes: { plan: "pro_monthly" },
-      }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      orderId = data.id;
-    } else {
-      const text = await res.text();
-      console.error("Failed to create order:", text);
-      try {
-        const json = JSON.parse(text);
-        if (json?.status === 401) {
-          useDirect = true;
-        }
-      } catch {}
-    }
-  } catch (e) {
-    console.error("Order creation error:", e);
-    useDirect = true;
-  }
 
   const options = {
     key: RAZORPAY_KEY_ID,
@@ -156,14 +128,8 @@ export async function openProCheckout(params: OpenProCheckoutParams = {}) {
     },
   };
 
-  if (!orderId && !useDirect) {
-    console.error("Order creation failed; checkout aborted.");
-    return;
-  }
   try {
-    if (!orderId && useDirect) {
-      delete (options as any).order_id;
-    }
+    delete (options as any).order_id;
     const rzp = new window.Razorpay!(options);
     rzp.open();
   } catch (e) {
