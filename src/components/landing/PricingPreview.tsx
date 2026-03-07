@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { openProCheckout } from "@/lib/razorpay";
+const FAKE_PAYMENTS = String(import.meta.env.VITE_FAKE_PAYMENTS ?? "").trim() === "true";
 
 const plans = [
   {
@@ -31,6 +33,12 @@ const plans = [
 ];
 
 export function PricingPreview() {
+  const handleProClick = () => {
+    openProCheckout({
+      amountInRupees: 499,
+    });
+  };
+
   return (
     <section id="pricing" className="py-24">
       <div className="container mx-auto px-4">
@@ -41,6 +49,11 @@ export function PricingPreview() {
           <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
             Start free. Upgrade when you need more.
           </p>
+          {FAKE_PAYMENTS && (
+            <p className="mx-auto mt-2 max-w-xl text-xs text-accent">
+              Test Mode: Any details accepted locally. No real payment processed.
+            </p>
+          )}
         </div>
 
         <div className="mx-auto mt-16 grid max-w-4xl gap-6 md:grid-cols-3">
@@ -73,14 +86,24 @@ export function PricingPreview() {
                   </li>
                 ))}
               </ul>
-              <Link to="/register" className="mt-6 block">
-                <Button
-                  variant={plan.popular ? "gradient" : "outline"}
-                  className="w-full"
+              {plan.name === "Pro" ? (
+                <button
+                  type="button"
+                  onClick={handleProClick}
+                  className="mt-6 block w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 hover:shadow-lg shadow-primary/20 h-10 px-4 py-2"
                 >
                   {plan.cta}
-                </Button>
-              </Link>
+                </button>
+              ) : (
+                <Link to="/register" className="mt-6 block">
+                  <Button
+                    variant={plan.popular ? "gradient" : "outline"}
+                    className="w-full"
+                  >
+                    {plan.cta}
+                  </Button>
+                </Link>
+              )}
             </motion.div>
           ))}
         </div>

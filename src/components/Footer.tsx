@@ -9,12 +9,13 @@ const footerLinks = {
   ],
   Company: [
     { label: "About", href: "/about" },
-    { label: "Contact", href: "/contact" },
-    { label: "Blog", href: "/blog" },
+    { label: "Contact Us", href: "/contact" },
   ],
   Legal: [
     { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
+    { label: "Terms and Conditions", href: "/terms" },
+    { label: "Refund and Cancellation", href: "/refund-cancellation" },
+    { label: "Shipping & Delivery", href: "/shipping-delivery" },
   ],
 };
 
