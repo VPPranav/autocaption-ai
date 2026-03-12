@@ -147,4 +147,4 @@ AutoCaption AI utilizes a **Premium Dark/Glassmorphism** aesthetic. The UI featu
 ---
 
 ## 📄 License
-© 2026 AutoCaption AI. Developed by [Pranav V P]. All rights reserved. Built for creators, by creators.
+© 2026 AutoCaption AI. Developed by Pranav V P. All rights reserved. Built for creators, by creators.
