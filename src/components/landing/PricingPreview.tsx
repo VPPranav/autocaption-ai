@@ -3,7 +3,6 @@ import { Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { openProCheckout } from "@/lib/razorpay";
-const FAKE_PAYMENTS = String(import.meta.env.VITE_FAKE_PAYMENTS ?? "").trim() === "true";
 
 const plans = [
   {
@@ -49,11 +48,6 @@ export function PricingPreview() {
           <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
             Start free. Upgrade when you need more.
           </p>
-          {FAKE_PAYMENTS && (
-            <p className="mx-auto mt-2 max-w-xl text-xs text-accent">
-              Test Mode: Any details accepted locally. No real payment processed.
-            </p>
-          )}
         </div>
 
         <div className="mx-auto mt-16 grid max-w-4xl gap-6 md:grid-cols-3">

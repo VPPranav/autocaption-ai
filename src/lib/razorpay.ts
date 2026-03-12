@@ -1,6 +1,5 @@
 const RAW_RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID as string | undefined;
 const RAZORPAY_KEY_ID = (RAW_RAZORPAY_KEY_ID ?? "").trim() || undefined;
-const FAKE_PAYMENTS = String(import.meta.env.VITE_FAKE_PAYMENTS ?? "").trim() === "true";
 
 export interface OpenProCheckoutParams {
   amountInRupees?: number;
@@ -53,24 +52,6 @@ export async function openProCheckout(params: OpenProCheckoutParams = {}) {
   const amountInRupees = params.amountInRupees ?? 499;
   const amountInPaise = Math.round(amountInRupees * 100);
 
-  if (FAKE_PAYMENTS) {
-    try {
-      const paymentId = `fake_${Date.now()}`;
-      const { addPayment } = await import("@/lib/payments");
-      addPayment({
-        id: paymentId,
-        amount: amountInPaise / 100,
-        currency: "INR",
-        status: "success",
-        createdAt: Date.now(),
-      });
-    } catch {}
-    try {
-      window.location.assign("/dashboard");
-    } catch {}
-    return;
-  }
-
   let orderId: string | undefined = undefined;
 
   const options = {
@@ -108,10 +89,14 @@ export async function openProCheckout(params: OpenProCheckoutParams = {}) {
           status: "success",
           createdAt: Date.now(),
         });
-      } catch {}
+      } catch { }
       try {
-        window.location.assign("/dashboard");
-      } catch {}
+        // Set a one-time pending flag so the next login/register consumes it
+        localStorage.setItem("pending_pro_activation", "true");
+        
+        // Redirect to register page after payment so they can create their account
+        window.location.assign("/register?success=pro");
+      } catch { }
     },
     modal: {
       ondismiss: () => {
@@ -123,7 +108,7 @@ export async function openProCheckout(params: OpenProCheckoutParams = {}) {
             status: "dismissed",
             createdAt: Date.now(),
           });
-        } catch {}
+        } catch { }
       },
     },
   };

@@ -3,7 +3,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -15,6 +15,8 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isProSuccess = searchParams.get("success") === "pro";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,8 +55,14 @@ const Register = () => {
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent">
                 <Sparkles className="h-6 w-6 text-primary-foreground" />
               </div>
-              <h1 className="font-display text-2xl font-bold">Create your account</h1>
-              <p className="mt-1 text-sm text-muted-foreground">Start generating captions for free</p>
+              <h1 className="font-display text-2xl font-bold">
+                {isProSuccess ? "Payment Successful! ✨" : "Create your account"}
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {isProSuccess 
+                  ? "Create your account below to activate your Pro plan" 
+                  : "Start generating captions for free"}
+              </p>
             </div>
 
             <Button

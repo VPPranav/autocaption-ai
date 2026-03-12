@@ -8,11 +8,12 @@ import { ToneSelector } from "@/components/dashboard/ToneSelector";
 import { CaptionResults } from "@/components/dashboard/CaptionResults";
 import { classifyImageFromUrl, labelsToHashtags } from "@/lib/vision";
 import { generateCaptionsFromLabels } from "@/lib/captionGenerator";
-import { hasUsedFree, markFreeUsed, isLoggedIn } from "@/lib/usageGate";
+import { hasUsedFree, markFreeUsed, isLoggedIn, getFreeGenerationsRemaining, hasUsedGuestLimit, markGuestLimitUsed } from "@/lib/usageGate";
 import { toast } from "sonner";
 
 export function HeroSection() {
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [credits, setCredits] = useState(getFreeGenerationsRemaining());
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [tone, setTone] = useState("marketing");
   const [loading, setLoading] = useState(false);
@@ -21,11 +22,26 @@ export function HeroSection() {
 
   const handleGenerate = async () => {
     if (!imageFile) return;
+    
     const loggedIn = await isLoggedIn();
-    if (!loggedIn && hasUsedFree()) {
-      toast.error("Please Sign in for further use");
+    
+    // Guest limit: Only 1 generation for non-logged-in users
+    if (!loggedIn && hasUsedGuestLimit()) {
+      toast.error("Login to generate more captions", {
+        description: "Guests are limited to 1 trial generation.",
+        action: {
+          label: "Log In",
+          onClick: () => window.location.assign("/login")
+        }
+      });
       return;
     }
+
+    if (hasUsedFree()) {
+      toast.error("Upgrade to Pro to generate more captions");
+      return;
+    }
+
     setLoading(true);
     setCaptions([]);
     setHashtags([]);
@@ -35,7 +51,13 @@ export function HeroSection() {
       const tags = labelsToHashtags(labels, tone);
       setCaptions(captionsGen);
       setHashtags(tags);
-      if (!loggedIn) markFreeUsed();
+      
+      if (loggedIn) {
+        markFreeUsed();
+      } else {
+        markGuestLimitUsed();
+      }
+      setCredits(getFreeGenerationsRemaining());
     } catch {
       const fallback = generateCaptionsFromLabels([], tone);
       setCaptions(fallback);
@@ -86,7 +108,7 @@ export function HeroSection() {
           </div>
 
           <p className="mt-4 text-sm text-muted-foreground">
-            5 free captions daily • No credit card required
+            {credits} free captions daily • No credit card required
           </p>
         </motion.div>
 
